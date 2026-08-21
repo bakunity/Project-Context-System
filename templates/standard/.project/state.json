@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "project": "{{PROJECT_NAME}}",
+  "state_doc": "docs/PROJECT_STATE.md",
+  "active_work_doc": "docs/ACTIVE_WORK.md",
+  "architecture_doc": "docs/ARCHITECTURE.md",
+  "roadmap_doc": "docs/ROADMAP.md",
+  "adr_dir": "docs/ADR",
+  "incidents_dir": "docs/INCIDENTS",
+  "evidence_doc": "docs/EVIDENCE.md",
+  "state_based_on_commit": "{{BASE_COMMIT}}",
+  "last_verified_commit": null,
+  "active_branch": "{{ACTIVE_BRANCH}}",
+  "active_pr": null,
+  "status": "bootstrap",
+  "updated_at": "{{DATE}}"
+}
