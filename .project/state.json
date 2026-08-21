@@ -8,10 +8,10 @@
   "adr_dir": "docs/ADR",
   "incidents_dir": "docs/INCIDENTS",
   "evidence_doc": "docs/EVIDENCE.md",
-  "state_based_on_commit": "b87c63ae20ed70b6834c6f0fd65494521dfcd4e3",
-  "last_verified_commit": "b87c63ae20ed70b6834c6f0fd65494521dfcd4e3",
-  "active_branch": "feat/pcs-v1-foundation",
-  "active_pr": 1,
-  "status": "review",
+  "state_based_on_commit": "1746d224ccfa80a719784f9c4ba652d21e3cde88",
+  "last_verified_commit": "1746d224ccfa80a719784f9c4ba652d21e3cde88",
+  "active_branch": "main",
+  "active_pr": null,
+  "status": "active",
   "updated_at": "2026-08-21"
 }

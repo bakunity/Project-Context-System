@@ -1,90 +1,70 @@
 # Project State
 
 Last updated: 2026-08-21
-State based on commit: `b87c63ae20ed70b6834c6f0fd65494521dfcd4e3`
-Last verified commit: `b87c63ae20ed70b6834c6f0fd65494521dfcd4e3`
-Status: review
+State based on commit: `1746d224ccfa80a719784f9c4ba652d21e3cde88`
+Status: active
 
 ## Purpose
 
-Project Context System (PCS) is a reusable, Git-native context continuity layer for AI-first software projects.
+Project Context System (PCS) is a reusable, Git-native and GitHub-first context continuity layer for AI-first software projects.
 
-Its purpose is to let a new AI session or developer reconstruct current project truth without depending on previous chat history.
-
-PCS is GitHub-first for operational workflow, but the core context protocol remains Git-native and repository-local.
+Its purpose is to let a fresh AI session reconstruct current project truth and continue development without depending on previous chat history.
 
 ## Confirmed principles
 
 - Git repository is authoritative project memory.
 - Chat/session is ephemeral workspace, not source of truth.
 - One type of truth has one owner document.
-- Context updates happen on semantic state transitions, not after every code edit.
+- Project-specific facts are CONFIRMED, INFERRED, UNKNOWN, STALE, or CONFLICT; missing facts are not invented.
+- Context is updated with semantic project changes.
 - Evidence is required for acceptance claims.
-- Project-specific `memories/` is intentionally avoided because it duplicates repository truth.
-- Handoff is a derived artifact, not a permanent truth file.
-- Machine-readable state points to human-readable truth; it does not duplicate architecture prose.
-- `state_based_on_commit` is a baseline SHA used for drift inspection, not a self-reference to the commit containing `state.json`.
-- GitHub Issues are units of work, Projects are execution views, and PRs are implementation review; none replaces repository truth.
-- Server/runtime access is outside default agent scope until an explicit live/staging task grants it.
-- Natural-language installation is a supported UX: an AI can be given the PCS repository URL and is expected to perform installation, context population, validation, and completion reporting itself.
-- `PCS READY` is an evidence-backed state, not a synonym for files having been copied.
+- Handoff is derived from repository truth and is not a second permanent truth file.
+- GitHub Issues/Projects/PRs coordinate execution but do not replace repository truth.
+- Server/runtime access is outside default agent scope until an explicit live task grants it.
+- Natural-language installation is supported: a user may give an AI only the PCS repository URL and ask it to add the system.
+- `PCS READY` means readiness validation passed, not merely that files were copied.
 
 ## Implemented
 
-- Repository and user-facing README initialized.
-- Canonical `AGENTS.md` behavior contract.
-- Machine-readable `.project/state.json`.
-- Project state, active work, architecture, roadmap, ADR, incident, and evidence layers.
+- `AGENTS.md` behavior contract.
+- `AGENT_INSTALL.md` natural-language installation protocol.
+- `pcs-manifest.json` machine-readable entrypoint.
+- `.project/state.json` bootstrap/freshness index.
+- `PROJECT_STATE`, `ACTIVE_WORK`, `ARCHITECTURE`, `ROADMAP`, ADR, INCIDENTS, and EVIDENCE layers.
 - `minimal`, `standard`, and `large` installation profiles.
 - Cross-platform Python installer.
-- Structural context validator.
-- Readiness validator via `validate_context.py --ready`.
-- GitHub Actions context check.
-- Evidence-oriented pull request template.
-- Automated installer tests for all profiles and existing-file protection.
-- GitHub Issue Forms for bug, feature, architecture, incident, and context drift.
-- GitHub CODEOWNERS template with installer owner detection from `origin`.
-- GitHub label, Project-model, and ruleset-policy manifests.
-- Safe `setup_github.py` helper for applying labels through GitHub CLI.
-- Explicit development-vs-runtime boundary in agent rules and architecture.
-- `docs/GITHUB_INTEGRATION.md` installed with the standard profile.
-- Root `AGENT_INSTALL.md` defining the one-sentence AI installation workflow.
-- Root `pcs-manifest.json` providing a machine-readable PCS install entrypoint.
-- Automated readiness test proving bootstrap context is rejected until real project context is populated.
+- Structural validation and `--ready` readiness validation.
+- GitHub Issue Forms, PR template, CODEOWNERS, Actions, labels/Project/ruleset manifests, and safe GitHub setup helper.
+- Automated installer, integration, regression, and readiness tests.
 
-## Verified
+## Accepted V1 baseline
 
-Commit `b87c63ae20ed70b6834c6f0fd65494521dfcd4e3` passed `PCS Context Check #8`:
+PR #1 was merged into `main` as squash commit `1746d224ccfa80a719784f9c4ba652d21e3cde88`.
 
-- PCS structural validation;
-- minimal profile installation test;
-- standard profile installation + validation test;
-- large profile installation test;
-- existing-file non-overwrite protection test;
-- standard profile GitHub integration assertions;
-- CODEOWNERS owner rendering from GitHub `origin`;
-- readiness validation FAIL on untouched bootstrap templates;
-- readiness validation PASS after real context replaces bootstrap prompts and state leaves `bootstrap`.
+The PR implementation and final context commits passed the PCS Context Check before merge, including:
 
-See `docs/EVIDENCE.md`.
+- minimal / standard / large installation;
+- existing-file protection;
+- GitHub integration assertions;
+- CODEOWNERS rendering;
+- untouched bootstrap readiness FAIL as designed;
+- populated context readiness PASS.
 
-## In progress
+The squash merge created a new immutable `main` SHA, so this context snapshot was reconciled to that SHA immediately after merge.
 
-- Review of PR #1 as the first mergeable PCS release candidate.
-- External installation smoke test against the next real product repository.
-- GitHub Project and Ruleset application remains explicit/manual in V1 and is tracked separately for V1.1.
+## Current work
+
+- First external real-product installation smoke test: Issue #2.
+- V1.1 safe GitHub Project/Ruleset automation: Issue #3.
 
 ## Known limitations
 
-- Installer has not yet been smoke-tested against a separate real product repository outside automated temporary-repository tests.
-- Automatic semantic drift detection is intentionally conservative in V1.
-- `--force` is replacement-oriented, not yet a schema-aware upgrade/migration engine.
-- Secret scanning, ADR linting, internal-link validation, Project automation, and Ruleset automation are not yet implemented.
-- GitHub Issue Form syntax is repository content but is not independently schema-validated by the current Python test suite.
+- First external installation in a real product repository is still pending Issue #2.
+- Semantic drift detection beyond structural/readiness checks is conservative in V1.
+- `--force` is replacement-oriented, not a schema-aware migration engine.
+- Secret scanning, ADR lint, internal-link validation, and automatic Project/Ruleset reconciliation are future work.
 
 ## Current truth boundaries
 
-`PROJECT_STATE.md` describes what is true now.
-It must not become a chronological development diary.
-
-Detailed historical reasoning belongs in ADRs, incidents, evidence, and Git history.
+`PROJECT_STATE.md` describes what is true now, not chronological history.
+Decision rationale belongs in ADRs, failure learning in INCIDENTS, acceptance in EVIDENCE, and chronology in Git.

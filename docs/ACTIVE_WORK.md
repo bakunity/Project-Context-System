@@ -2,60 +2,46 @@
 
 ## Current goal
 
-Finish PCS V1 as a reusable Git-native, GitHub-first context layer that can be added to a new product by giving an AI only the PCS repository URL, before server/runtime work begins.
+Use PCS V1 in the next real product repository and prove the one-sentence installation workflow end to end.
 
 ## Branch / PR
 
-Branch: `feat/pcs-v1-foundation`
-PR: `#1`
+Branch: `main`
+PR: none
 
-## Base / verified commit
+## Base / verified baseline
 
-Context baseline: `b87c63ae20ed70b6834c6f0fd65494521dfcd4e3`
-Last verified commit: `b87c63ae20ed70b6834c6f0fd65494521dfcd4e3`
+Context baseline: `1746d224ccfa80a719784f9c4ba652d21e3cde88`
+V1 merged from PR #1.
 
 ## Accepted baseline
 
-- Core PCS document model exists.
-- Minimal / standard / large profile overlays work in automated tests.
-- Existing project files are protected unless `--force` is used.
-- GitHub-first operational layer is installed by the standard profile.
-- Agent rules default to repository/local/CI development and prohibit implicit server/runtime mutation.
-- `AGENT_INSTALL.md` defines natural-language installation behavior.
-- `pcs-manifest.json` exposes the agent entrypoint and default profile.
-- Structural installation and contextual readiness are separate states.
-- `validate_context.py --ready` rejects untouched bootstrap context and passes after evidence-backed context is populated.
+- PCS V1 is merged into `main`.
+- Natural-language agent installation contract exists.
+- Standard profile installs core context plus GitHub-first workflow files.
+- Structural and readiness validation are separate.
+- Regression tests protect installer overlays, existing-file safety, GitHub integration, CODEOWNERS rendering, and readiness behavior.
+- Runtime/server access is forbidden by default during PCS installation.
 
 ## Current work
 
-- Review PR #1 as the V1 release candidate.
-- Use the next new product repository as the first real external installation target.
-- Keep Project/Ruleset application explicit until V1.1 automation is separately accepted.
+- Issue #2: first external installation in the next real product repository.
+- Issue #3: V1.1 safe automation for GitHub Project and Ruleset setup.
 
 ## Current blocker
 
-No code blocker. External real-product installation is still not verified.
+No PCS V1 code blocker.
+External real-product smoke evidence is not yet recorded.
 
 ## Next safe action
 
-In the next product repository, give the AI the PCS repository URL only, let it follow `AGENT_INSTALL.md`, require `PCS READY`, record exact product commit/evidence in Issue #2, and continue product development without server access until a separate Live gate.
+In the next product repository, tell the AI only:
 
-## Tests already accepted
+`Добавь в проект систему контекста https://github.com/bakunity/Project-Context-System`
 
-For commit `b87c63ae20ed70b6834c6f0fd65494521dfcd4e3`:
-
-- context validator PASS;
-- minimal installer PASS;
-- standard installer + validator PASS;
-- large installer PASS;
-- existing-file protection PASS;
-- GitHub integration assertions PASS;
-- CODEOWNERS owner rendering PASS;
-- untouched bootstrap `--ready` FAIL as designed;
-- populated context `--ready` PASS.
-
-Do not repeat these exact CI scenarios without a concrete regression reason after unchanged implementation.
+Require the agent to follow `AGENT_INSTALL.md`, reach `PCS READY`, record exact evidence in Issue #2, and then continue product development. Keep server/runtime out of scope until a separate Live gate.
 
 ## Approval gate
 
-PR remains draft. Merge/tag of V1 requires explicit review/approval and preferably the external smoke evidence from Issue #2.
+No production/server mutation is implied by PCS installation.
+Future release/governance changes should follow Issues -> branch -> PR -> CI unless explicitly approved otherwise.
