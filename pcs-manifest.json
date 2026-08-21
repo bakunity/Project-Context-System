@@ -1,0 +1,16 @@
+{
+  "name": "Project Context System",
+  "short_name": "PCS",
+  "protocol_version": 1,
+  "source_repository": "https://github.com/bakunity/Project-Context-System",
+  "architecture": "git-native",
+  "primary_integration": "github-first",
+  "agent_install_entrypoint": "AGENT_INSTALL.md",
+  "default_profile": "standard",
+  "installer": "scripts/install_pcs.py",
+  "validator": "scripts/validate_context.py",
+  "structural_validation": "python scripts/validate_context.py .",
+  "readiness_validation": "python scripts/validate_context.py . --ready",
+  "runtime_scope_default": "forbidden",
+  "completion_status": "PCS READY"
+}

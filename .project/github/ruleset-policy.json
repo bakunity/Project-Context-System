@@ -1,0 +1,16 @@
+{
+  "target_branch": "main",
+  "recommended": {
+    "require_pull_request": true,
+    "require_status_checks": ["validate-context"],
+    "block_force_push": true,
+    "block_deletion": true,
+    "require_conversation_resolution": true,
+    "require_code_owner_review_when_team_exists": true
+  },
+  "notes": [
+    "This file is a PCS policy manifest, not a GitHub API payload.",
+    "Apply repository rules only after reviewing plan/repository capabilities.",
+    "Deployment approval remains a separate runtime boundary."
+  ]
+}
