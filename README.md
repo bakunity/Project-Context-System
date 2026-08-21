@@ -2,25 +2,13 @@
 
 **Project Context System** — переносимая система постоянного контекста для AI-first разработки.
 
-PCS решает простую проблему: рабочее состояние проекта не должно зависеть от памяти конкретного чата, окна ChatGPT, Codex-сессии или отдельного разработчика.
+PCS решает простую проблему: рабочее состояние проекта не должно зависеть от памяти конкретного чата, ChatGPT/Codex-сессии или отдельного разработчика.
 
 > **CHAT IS WORKSPACE. GIT IS MEMORY. DOCS ARE CURRENT KNOWLEDGE.**
 
-## Зачем это нужно
+PCS является **Git-native + GitHub-first** системой: ядро контекста хранится прямо в репозитории и работает без GitHub UI, а GitHub используется как удобный operational layer для Issues, Projects, PR, Actions и governance.
 
-В большом проекте AI легко теряет:
-
-- что уже реализовано и принято;
-- какой commit действительно проверен;
-- что делается прямо сейчас;
-- почему было принято архитектурное решение;
-- какие гипотезы уже исключены;
-- какие live-проверки уже были выполнены;
-- что нельзя менять без отдельного approval.
-
-PCS переносит эти знания в Git и делает их частью инженерного процесса.
-
-## Модель PCS
+## Что хранит PCS
 
 | Тип знания | Источник |
 | --- | --- |
@@ -34,18 +22,22 @@ PCS переносит эти знания в Git и делает их част�
 | Что реально проверено | `docs/EVIDENCE.md` |
 | Машинный bootstrap/freshness | `.project/state.json` |
 | История изменений | Git |
+| Единица работы | GitHub Issue |
+| Оперативная доска | GitHub Project |
 | Временные мысли | chat/session |
 
-## Ключевые принципы
+## Основные принципы
 
-1. **Repository state beats chat memory.**
-2. Один тип truth хранится только в одном authoritative месте.
+1. Repository state beats chat memory.
+2. Один тип truth хранится в одном authoritative месте.
 3. Контекст обновляется вместе с кодом при semantic state transition.
 4. `Done` без tests/smoke/evidence не считается доказательством.
 5. AI работает относительно явного base commit.
-6. Если repository evidence отсутствует — project-specific truth нельзя додумывать.
-7. Handoff — производный артефакт, а не второй source of truth.
-8. `memories/` не используется как repository-specific truth.
+6. Missing project truth не додумывается.
+7. Handoff — derived artifact, не второй source of truth.
+8. Project-specific `memories/` не используется.
+9. Issues/Projects координируют работу, но не заменяют repository truth.
+10. Server/runtime access никогда не подразумевается автоматически.
 
 ## Bootstrap новой AI-сессии
 
@@ -55,44 +47,59 @@ PCS переносит эти знания в Git и делает их част�
 3. Read docs/PROJECT_STATE.md
 4. Read docs/ARCHITECTURE.md
 5. Read docs/ACTIVE_WORK.md
-6. Read only relevant ADR / CONTEXT docs
-7. Inspect git status
-8. Inspect recent commits
-9. Compare HEAD with state_based_on_commit
-10. If drift exists -> inspect diff and reconcile
+6. Read relevant ADR / CONTEXT only
+7. Inspect git status and recent commits
+8. Compare HEAD with state_based_on_commit
+9. Inspect drift if needed
+10. Read linked Issue/task brief
 11. Summarize understanding
 12. Only then plan work
 ```
 
-## Быстрое внедрение
+## Как встроить PCS в новый проект
 
-После клонирования этого репозитория:
-
-```bash
-python scripts/install_pcs.py /path/to/your/project
-```
-
-По умолчанию устанавливается стандартный профиль. Доступны:
+Создай обычный GitHub-репозиторий для продукта и клонируй PCS рядом. Затем:
 
 ```bash
-python scripts/install_pcs.py /path/to/project --profile minimal
-python scripts/install_pcs.py /path/to/project --profile standard
-python scripts/install_pcs.py /path/to/project --profile large
+python scripts/install_pcs.py /path/to/your-product --profile standard
 ```
 
-Установщик не перезаписывает существующие файлы без `--force`.
+После установки в **самом репозитории продукта** появятся PCS-файлы, Issue Forms, PR/CI настройки и GitHub manifests. Никакой отдельный runtime-сервис PCS для этого не нужен.
 
-После установки:
+Дальше:
 
-```bash
-python scripts/validate_context.py /path/to/project
+```text
+1. Заполнить PROJECT_STATE / ARCHITECTURE / ROADMAP реальными данными.
+2. Проверить AGENTS.md и CODEOWNERS.
+3. Выполнить validate_context.py.
+4. Commit initial PCS context baseline.
+5. Push продукта в GitHub.
+6. При желании применить labels через setup_github.py.
+7. Создавать разработку через Issues -> branch/task -> PR -> CI.
+8. Не подключать сервер, пока продукт не дошёл до отдельного Live gate.
 ```
+
+## Development first, server later
+
+Рекомендуемый процесс для нового продукта:
+
+```text
+GitHub repository
+  -> PCS baseline
+  -> Issues / agent tasks
+  -> implementation
+  -> tests + CI
+  -> PR / review
+  -> product milestone
+  -> explicit staging/server task
+  -> live verification
+```
+
+Это позволяет агенту спокойно разрабатывать продукт и не путать repository acceptance с live deployment.
 
 ## Профили
 
 ### minimal
-
-Для небольшого приложения:
 
 - `AGENTS.md`
 - `.project/state.json`
@@ -103,17 +110,21 @@ python scripts/validate_context.py /path/to/project
 
 ### standard
 
-Для обычного production-проекта дополнительно:
+Дополнительно:
 
 - `ACTIVE_WORK.md`
 - `INCIDENTS/`
 - `EVIDENCE.md`
+- GitHub Issue Forms
 - PR template
-- context validation
+- CODEOWNERS
+- GitHub Actions context check
+- labels / Project / ruleset manifests
+- `setup_github.py`
 
 ### large
 
-Для сложных систем дополнительно:
+Дополнительно:
 
 - `CONTEXT/PRODUCT.md`
 - `CONTEXT/BACKEND.md`
@@ -121,16 +132,20 @@ python scripts/validate_context.py /path/to/project
 - `CONTEXT/INFRASTRUCTURE.md`
 - `research/`
 
-## Статусы знания
+## Проверка
 
-При восстановлении контекста AI должен различать:
+```bash
+python scripts/validate_context.py /path/to/project
+```
 
-- **CONFIRMED** — подтверждено repository/runtime evidence;
-- **INFERRED** — следует из кода, но не зафиксировано как truth;
-- **UNKNOWN** — информации нет;
-- **STALE** — документ старее релевантного кода;
-- **CONFLICT** — authoritative источники расходятся.
+Для безопасных GitHub-настроек после проверки:
 
-## Статус проекта
+```bash
+python scripts/setup_github.py /path/to/project --apply-labels
+```
 
-PCS находится в ранней стадии разработки. Цель V1 — сделать систему, которую можно добавить в новый репозиторий одной командой и использовать с ChatGPT, Codex и другими coding agents без привязки к конкретной AI-сессии.
+Rulesets/Project governance в V1 представлены декларативными manifest-файлами и не применяются автоматически, потому что они меняют правила merge и должны быть явно просмотрены.
+
+## Документация GitHub integration
+
+См. `docs/GITHUB_INTEGRATION.md`.

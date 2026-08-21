@@ -6,6 +6,8 @@ Repository state beats chat/session memory.
 
 Do not use previous conversation memory as authoritative project-specific truth when repository evidence is available or required.
 
+GitHub Issues, Projects, and PR descriptions coordinate work but do not replace repository truth files.
+
 ## Bootstrap
 
 Before planning or changing code:
@@ -19,7 +21,8 @@ Before planning or changing code:
 7. Inspect recent commits.
 8. Compare current HEAD with `state_based_on_commit`.
 9. If they differ, inspect the diff and classify context as current, stale, or conflicting.
-10. Summarize current understanding before implementation.
+10. Read the linked Issue/task brief when one exists.
+11. Summarize current understanding before implementation.
 
 ## Knowledge status
 
@@ -39,6 +42,20 @@ Respect task-specific allowed and forbidden paths.
 Do not expand scope silently.
 Prefer the smallest change that satisfies the task unless refactoring is explicitly allowed.
 
+## Development vs runtime boundary
+
+Default agent work is repository/local/CI only.
+
+Unless the task explicitly grants runtime scope, the agent must not:
+
+- connect to servers;
+- deploy to staging or production;
+- mutate runtime infrastructure;
+- issue or rotate production credentials/certificates;
+- perform destructive live tests.
+
+A project may reach a `Live gate` where repository implementation is complete but staging/server verification is still pending. Runtime work then requires a separate explicit task, named environment, verification plan, and evidence update.
+
 ## Architecture changes
 
 An architecture change is incomplete unless relevant code, tests, `docs/ARCHITECTURE.md`, and an ADR are updated together.
@@ -55,10 +72,18 @@ Report exact tests, smoke checks, environment, limitations, and anything not ver
 Static CI PASS does not automatically mean live/runtime PASS.
 A failing test harness does not automatically mean the product is broken; verify independent state when reasonable.
 
-## Git
+## Git and GitHub
 
 Work from an explicit base commit for bounded agent tasks.
 Do not claim a moving branch was tested when only an older SHA was tested.
+
+Preferred execution chain:
+
+```text
+Issue -> branch/task -> commits -> PR -> CI/review -> merge
+```
+
+Issues are units of work. Projects are execution views. PRs are implementation review. None of them silently overrides `PROJECT_STATE`, ADR, architecture, or evidence.
 
 ## Context updates
 
@@ -78,7 +103,7 @@ Ownership:
 
 ## Secrets
 
-Never write secrets, tokens, private keys, credentials, or sensitive raw logs into context, docs, evidence, ADRs, or incidents.
+Never write secrets, tokens, private keys, credentials, or sensitive raw logs into context, docs, evidence, ADRs, incidents, Issues, or PR bodies.
 
 ## Approval boundaries
 
@@ -91,6 +116,7 @@ For substantial delegated work, define:
 - Goal
 - Base commit
 - Context to read
+- Linked Issue when available
 - Allowed files/paths
 - Forbidden files/paths
 - Required behavior
@@ -98,6 +124,7 @@ For substantial delegated work, define:
 - Change policy
 - Tests to run
 - Smoke test
+- Runtime access: No / Later live gate / Explicitly allowed
 - Context/docs that may need update
 - Approval required before
 - Expected report

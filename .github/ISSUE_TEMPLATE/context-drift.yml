@@ -1,0 +1,36 @@
+name: Context drift
+description: Report disagreement between code, project state, ADR, evidence, or Git history
+title: "[Context drift]: "
+body:
+  - type: textarea
+    id: conflict
+    attributes:
+      label: Conflict
+      description: Which sources disagree and what does each claim?
+    validations:
+      required: true
+  - type: input
+    id: head
+    attributes:
+      label: Current HEAD
+      placeholder: exact SHA
+    validations:
+      required: true
+  - type: input
+    id: baseline
+    attributes:
+      label: state_based_on_commit
+      placeholder: exact SHA or UNKNOWN
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Relevant diff / evidence
+    validations:
+      required: true
+  - type: textarea
+    id: safe
+    attributes:
+      label: Proposed safe reconciliation
+      description: Do not silently choose one source as truth.

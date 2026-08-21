@@ -1,0 +1,18 @@
+{
+  "name": "Development",
+  "purpose": "Operational work tracking. ROADMAP.md remains strategic truth.",
+  "views": ["table", "board", "roadmap"],
+  "fields": {
+    "Status": ["Inbox", "Ready", "In progress", "Review", "Live gate", "Done"],
+    "Priority": ["P0", "P1", "P2", "P3"],
+    "Type": ["Feature", "Bug", "Architecture", "Incident", "Context", "Research", "Maintenance"],
+    "Risk": ["Low", "Medium", "High"],
+    "Runtime": ["No runtime", "Staging later", "Live required"]
+  },
+  "rules": [
+    "Issues are units of work, not authoritative project truth.",
+    "ROADMAP.md stores strategy; the Project stores execution.",
+    "Closed issue does not by itself prove live acceptance.",
+    "Use Live gate when repository implementation is complete but runtime evidence is pending."
+  ]
+}
