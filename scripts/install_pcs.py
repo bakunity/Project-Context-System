@@ -35,7 +35,17 @@ def render(text: str, values: dict[str, str]) -> str:
     return text
 
 
-def copy_overlay(source: Path, target: Path, values: dict[str, str], force: bool) -> tuple[list[str], list[str]]:
+def existing_files(root: Path) -> set[Path]:
+    return {path.relative_to(root) for path in root.rglob("*") if path.is_file()}
+
+
+def copy_overlay(
+    source: Path,
+    target: Path,
+    values: dict[str, str],
+    force: bool,
+    protected: set[Path],
+) -> tuple[list[str], list[str]]:
     created: list[str] = []
     skipped: list[str] = []
 
@@ -44,9 +54,14 @@ def copy_overlay(source: Path, target: Path, values: dict[str, str], force: bool
             continue
         rel = src.relative_to(source)
         dst = target / rel
-        if dst.exists() and not force:
+
+        # Protect only files that existed before this installer invocation.
+        # Overlay files created earlier in the same run may be intentionally
+        # replaced by a more specific profile (minimal -> standard -> large).
+        if rel in protected and not force:
             skipped.append(str(rel))
             continue
+
         dst.parent.mkdir(parents=True, exist_ok=True)
         text = src.read_text(encoding="utf-8")
         dst.write_text(render(text, values), encoding="utf-8")
@@ -55,8 +70,9 @@ def copy_overlay(source: Path, target: Path, values: dict[str, str], force: bool
     return created, skipped
 
 
-def copy_file(src: Path, dst: Path, force: bool) -> str:
-    if dst.exists() and not force:
+def copy_file(src: Path, dst: Path, target: Path, force: bool, protected: set[Path]) -> str:
+    rel = dst.relative_to(target)
+    if rel in protected and not force:
         return "skipped"
     dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, dst)
@@ -67,11 +83,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Install PCS into a Git project")
     parser.add_argument("target", nargs="?", default=".", help="Target repository path")
     parser.add_argument("--profile", choices=["minimal", "standard", "large"], default="standard")
-    parser.add_argument("--force", action="store_true", help="Overwrite existing PCS files")
+    parser.add_argument("--force", action="store_true", help="Overwrite files that existed before installation")
     args = parser.parse_args()
 
     target = Path(args.target).resolve()
     target.mkdir(parents=True, exist_ok=True)
+    protected = existing_files(target)
 
     project_name = target.name
     base_commit = git_value(target, "rev-parse", "HEAD", fallback="UNCOMMITTED")
@@ -94,7 +111,7 @@ def main() -> int:
     all_skipped: list[str] = []
 
     for overlay in overlays:
-        created, skipped = copy_overlay(overlay, target, values, args.force)
+        created, skipped = copy_overlay(overlay, target, values, args.force, protected)
         all_created.extend(created)
         all_skipped.extend(skipped)
 
@@ -104,7 +121,7 @@ def main() -> int:
             (PCS_ROOT / ".github/workflows/pcs-context-check.yml", target / ".github/workflows/pcs-context-check.yml"),
         ]
         for src, dst in extras:
-            result = copy_file(src, dst, args.force)
+            result = copy_file(src, dst, target, args.force, protected)
             rel = str(dst.relative_to(target))
             (all_created if result == "created" else all_skipped).append(rel)
 
@@ -114,8 +131,8 @@ def main() -> int:
         print(f"  + {item}")
 
     if all_skipped:
-        print(f"Skipped existing: {len(all_skipped)}")
-        for item in all_skipped:
+        print(f"Protected existing files: {len(all_skipped)}")
+        for item in sorted(set(all_skipped)):
             print(f"  = {item}")
         print("Use --force only after reviewing existing project context.")
 
