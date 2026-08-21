@@ -22,3 +22,6 @@ jobs:
 
       - name: Validate PCS context
         run: python scripts/validate_context.py .
+
+      - name: Test installer profiles
+        run: python -m unittest discover -s tests -v
