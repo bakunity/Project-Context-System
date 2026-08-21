@@ -6,6 +6,45 @@ This file records acceptance evidence for scenarios where `code review` or `CI P
 
 Do not repeat an already accepted scenario without a concrete regression reason when the relevant implementation has not changed.
 
+## PCS-V1-CI-003 — Natural-language AI installation and readiness contract
+
+Status: PASS
+Commit: `b87c63ae20ed70b6834c6f0fd65494521dfcd4e3`
+Environment: GitHub Actions / Ubuntu 24.04 / Python 3.12
+Date: 2026-08-21
+Workflow run: `PCS Context Check #8`
+
+### Verification
+
+- `python scripts/validate_context.py .`
+- `python -m unittest discover -s tests -v`
+
+Automated scenarios include all previously accepted installer/GitHub checks plus:
+
+1. a fresh standard PCS installation passes structural validation;
+2. the same untouched bootstrap installation fails `validate_context.py --ready`;
+3. bootstrap prompts and bootstrap state are treated as readiness blockers;
+4. after evidence-backed example project context replaces template prompts and state changes to `development`, `--ready` passes;
+5. existing CODEOWNERS owner rendering remains intact after readiness support was added.
+
+### Evidence
+
+GitHub Actions job `validate-context` completed successfully for commit `b87c63ae20ed70b6834c6f0fd65494521dfcd4e3`.
+Both `Validate PCS context` and `Test installer profiles` completed with `success`.
+
+The immediately preceding run #7 failed because the first readiness implementation accidentally dropped the established CODEOWNERS rendering variables. The existing regression test caught that change. Commit `b87c63ae20ed70b6834c6f0fd65494521dfcd4e3` restored the accepted CODEOWNERS behavior while preserving readiness validation, and the complete suite then passed.
+
+### Limitations
+
+- The agent protocol itself is a repository contract; generic third-party agents are not technically forced to obey it unless they read the repository as instructed.
+- The first external real-product installation has not yet been performed.
+- Runtime/server access remains intentionally outside this scenario.
+- Readiness validation detects known bootstrap/template markers and state, not semantic correctness of every prose statement.
+
+### Regression reason
+
+Natural-language installation added a new readiness state and changed installer completion behavior after PCS-V1-CI-002.
+
 ## PCS-V1-CI-002 — GitHub-first integration layer
 
 Status: PASS
