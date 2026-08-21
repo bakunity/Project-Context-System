@@ -8,6 +8,32 @@ PCS решает простую проблему: рабочее состоян�
 
 PCS является **Git-native + GitHub-first** системой: ядро контекста хранится прямо в репозитории и работает без GitHub UI, а GitHub используется как удобный operational layer для Issues, Projects, PR, Actions и governance.
 
+## Установка одной фразой через AI
+
+Это целевой UX PCS.
+
+Если AI/coding agent имеет доступ к текущему проекту и GitHub/Git, пользователю достаточно сказать:
+
+> **Бро, добавь в проект систему контекста https://github.com/bakunity/Project-Context-System**
+
+После этого агент должен сам:
+
+1. открыть PCS и прочитать `AGENT_INSTALL.md` / `pcs-manifest.json`;
+2. определить текущий project repository;
+3. установить профиль `standard`;
+4. изучить реальный код, docs, tests и Git state проекта;
+5. заполнить `PROJECT_STATE`, `ARCHITECTURE`, `ROADMAP`, `ACTIVE_WORK` реальными подтверждёнными данными;
+6. не додумывать отсутствующие факты и не ходить на сервер;
+7. выполнить structural validation;
+8. выполнить `validate_context.py --ready`;
+9. проверить diff и сохранить baseline согласно Git workflow проекта;
+10. написать `PCS READY` только если readiness validation действительно прошёл.
+
+Канонический протокол для агента: [`AGENT_INSTALL.md`](AGENT_INSTALL.md).
+Машиночитаемый entrypoint: [`pcs-manifest.json`](pcs-manifest.json).
+
+После этого новый AI-чат должен иметь возможность восстановить проект из самого repository и продолжить разработку без обязательного доступа к прошлому диалогу.
+
 ## Что хранит PCS
 
 | Тип знания | Источник |
@@ -56,7 +82,7 @@ PCS является **Git-native + GitHub-first** системой: ядро к
 12. Only then plan work
 ```
 
-## Как встроить PCS в новый проект
+## Как встроить PCS вручную/скриптом
 
 Создай обычный GitHub-репозиторий для продукта и клонируй PCS рядом. Затем:
 
@@ -71,12 +97,13 @@ python scripts/install_pcs.py /path/to/your-product --profile standard
 ```text
 1. Заполнить PROJECT_STATE / ARCHITECTURE / ROADMAP реальными данными.
 2. Проверить AGENTS.md и CODEOWNERS.
-3. Выполнить validate_context.py.
-4. Commit initial PCS context baseline.
-5. Push продукта в GitHub.
-6. При желании применить labels через setup_github.py.
-7. Создавать разработку через Issues -> branch/task -> PR -> CI.
-8. Не подключать сервер, пока продукт не дошёл до отдельного Live gate.
+3. Выполнить structural validation.
+4. Выполнить readiness validation (--ready).
+5. Commit initial PCS context baseline.
+6. Push продукта в GitHub.
+7. При желании применить labels через setup_github.py.
+8. Создавать разработку через Issues -> branch/task -> PR -> CI.
+9. Не подключать сервер, пока продукт не дошёл до отдельного Live gate.
 ```
 
 ## Development first, server later
@@ -134,9 +161,19 @@ GitHub repository
 
 ## Проверка
 
+Структурная проверка:
+
 ```bash
 python scripts/validate_context.py /path/to/project
 ```
+
+Проверка готовности после заполнения реального контекста:
+
+```bash
+python scripts/validate_context.py /path/to/project --ready
+```
+
+`--ready` специально падает, если шаблонные bootstrap-подсказки ещё не заменены или state всё ещё имеет bootstrap-статус.
 
 Для безопасных GitHub-настроек после проверки:
 
