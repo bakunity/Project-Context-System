@@ -2,7 +2,7 @@
 
 ## Current goal
 
-Review and harden PCS V1 foundation before merging it into `main`.
+Finish PCS V1 as a reusable Git-native, GitHub-first context layer that can be installed directly into the next product repository before server/runtime work begins.
 
 ## Branch / PR
 
@@ -11,8 +11,8 @@ PR: `#1`
 
 ## Base / verified commit
 
-Context baseline: `d2aa8e0f7ad4f44f1dbc1c112e295ff77a37d9d8`
-Last verified commit: `d2aa8e0f7ad4f44f1dbc1c112e295ff77a37d9d8`
+Context baseline: `50912e530a21e722ce3eff1b94410ae3c8fe84b1`
+Last verified commit: `50912e530a21e722ce3eff1b94410ae3c8fe84b1`
 
 ## Accepted baseline
 
@@ -21,29 +21,35 @@ Last verified commit: `d2aa8e0f7ad4f44f1dbc1c112e295ff77a37d9d8`
 - Files that existed before installation are protected unless `--force` is used.
 - Structural validator passes.
 - GitHub Actions installer test suite passes.
+- Standard profile installs GitHub Issue Forms, CODEOWNERS, PR/CI workflow, GitHub manifests, integration docs, and `setup_github.py`.
+- Installer renders CODEOWNERS from GitHub `origin` when available.
+- Agent rules default to repository/local/CI development and prohibit implicit server/runtime mutation.
 
 ## Current work
 
-- Review PR #1 structure and behavior.
-- Perform an external-repository smoke test when an appropriate test target is available.
+- Review PR #1 as the V1 release candidate.
+- Use the next new product repository as the first real installation smoke target.
+- Keep Project/Ruleset application explicit until their automation is separately designed and accepted.
 
 ## Current blocker
 
-No code blocker. External real-repository smoke test is still not verified.
+No code blocker. External real-repository installation is still not verified.
 
 ## Next safe action
 
-Review PR #1. If the structure is accepted, run PCS against a disposable or new real project repository, record evidence, then mark the PR ready for merge.
+When the new product repository is created, install PCS `standard` into it, fill initial truth, validate, commit the baseline, push to GitHub, and begin development through Issues -> branch/task -> PR -> CI. Do not connect the server until an explicit Live gate task exists.
 
 ## Tests already accepted
 
-For commit `d2aa8e0f7ad4f44f1dbc1c112e295ff77a37d9d8`:
+For commit `50912e530a21e722ce3eff1b94410ae3c8fe84b1`:
 
 - context validator PASS;
 - minimal installer PASS;
 - standard installer + validator PASS;
 - large installer PASS;
-- existing-file protection PASS.
+- existing-file protection PASS;
+- GitHub integration files installed by standard profile PASS;
+- CODEOWNERS owner rendering PASS.
 
 Do not repeat these exact CI scenarios without a concrete regression reason after an unchanged implementation.
 
