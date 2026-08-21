@@ -30,17 +30,12 @@ def git_value(root: Path, *args: str, fallback: str) -> str:
     return value if proc.returncode == 0 and value else fallback
 
 
-def github_owner(root: Path) -> str:
-    remote = git_value(root, "remote", "get-url", "origin", fallback="")
-    patterns = [
-        r"github\.com[:/]([^/]+)/[^/]+(?:\.git)?$",
-        r"github\.com/([^/]+)/[^/]+(?:\.git)?$",
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, remote)
-        if match:
-            return match.group(1)
-    return "OWNER_REVIEW_REQUIRED"
+def github_owner(root: Path) -> str | None:
+    remote = git_value(root, "config", "--get", "remote.origin.url", fallback="")
+    if not remote:
+        return None
+    match = re.search(r"github\.com[/:]([^/]+)/[^/]+(?:\.git)?$", remote)
+    return match.group(1) if match else None
 
 
 def render(text: str, values: dict[str, str]) -> str:
@@ -107,13 +102,28 @@ def main() -> int:
     project_name = target.name
     base_commit = git_value(target, "rev-parse", "HEAD", fallback="UNCOMMITTED")
     branch = git_value(target, "branch", "--show-current", fallback="UNKNOWN")
+    owner = github_owner(target)
+
+    if owner:
+        codeowner_line = f"* @{owner}"
+        codeowner_context = (
+            f"/.project/ @{owner}\n"
+            f"/AGENTS.md @{owner}\n"
+            f"/docs/ARCHITECTURE.md @{owner}\n"
+            f"/docs/ADR/ @{owner}\n"
+            f"/.github/ @{owner}"
+        )
+    else:
+        codeowner_line = "# * @your-github-user-or-team"
+        codeowner_context = "# Review CODEOWNERS after connecting the GitHub origin."
 
     values = {
         "PROJECT_NAME": project_name,
         "DATE": date.today().isoformat(),
         "BASE_COMMIT": base_commit,
         "ACTIVE_BRANCH": branch,
-        "GITHUB_OWNER": github_owner(target),
+        "CODEOWNER_LINE": codeowner_line,
+        "CODEOWNER_CONTEXT_LINE": codeowner_context,
     }
 
     overlays = [TEMPLATES / "minimal"]
@@ -161,6 +171,7 @@ def main() -> int:
         print(f"3. Structural check: python {target / 'scripts/validate_context.py'} {target}")
         print(f"4. Readiness check:  python {target / 'scripts/validate_context.py'} {target} --ready")
         print("5. Review the diff and commit the initial PCS context baseline according to repository policy.")
+        print("6. Push to GitHub; optionally run setup_github.py --apply-labels.")
         print("Do not report 'PCS READY' until the readiness check passes.")
     else:
         print("2. Set .project/state.json to a real lifecycle status after context is populated.")
