@@ -48,8 +48,8 @@ PCS является **Git-native + GitHub-first** системой: ядро к
 | Что реально проверено | `docs/EVIDENCE.md` |
 | Машинный bootstrap/freshness | `.project/state.json` |
 | История изменений | Git |
-| Единица работы | GitHub Issue |
-| Оперативная доска | GitHub Project |
+| Единица работы | GitHub Issue по умолчанию; внешний work item (например Jira) при orchestration profile |
+| Оперативная доска | GitHub Project по умолчанию; внешний Kanban/engineering board при orchestration profile |
 | Временные мысли | chat/session |
 
 ## Основные принципы
@@ -62,7 +62,7 @@ PCS является **Git-native + GitHub-first** системой: ядро к
 6. Missing project truth не додумывается.
 7. Handoff — derived artifact, не второй source of truth.
 8. Project-specific `memories/` не используется.
-9. Issues/Projects координируют работу, но не заменяют repository truth.
+9. Work trackers координируют работу, но не заменяют repository truth.
 10. Server/runtime access никогда не подразумевается автоматически.
 
 ## Bootstrap новой AI-сессии
@@ -102,7 +102,7 @@ python scripts/install_pcs.py /path/to/your-product --profile standard
 5. Commit initial PCS context baseline.
 6. Push продукта в GitHub.
 7. При желании применить labels через setup_github.py.
-8. Создавать разработку через Issues -> branch/task -> PR -> CI.
+8. Создавать разработку через выбранный work tracker -> branch/task -> PR -> CI.
 9. Не подключать сервер, пока продукт не дошёл до отдельного Live gate.
 ```
 
@@ -113,7 +113,7 @@ python scripts/install_pcs.py /path/to/your-product --profile standard
 ```text
 GitHub repository
   -> PCS baseline
-  -> Issues / agent tasks
+  -> work item / agent task
   -> implementation
   -> tests + CI
   -> PR / review
@@ -186,3 +186,9 @@ Rulesets/Project governance в V1 представлены декларатив�
 ## Документация GitHub integration
 
 См. `docs/GITHUB_INTEGRATION.md`.
+
+## External work orchestration
+
+PCS может использовать внешние work-management инструменты, не превращая их во второй source of truth.
+
+Для модели с ChatGPT, Trello и Jira см. [`docs/ORCHESTRATION.md`](docs/ORCHESTRATION.md).
